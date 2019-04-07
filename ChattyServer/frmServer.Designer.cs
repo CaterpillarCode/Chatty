@@ -62,6 +62,7 @@
             this.btnListen.TabIndex = 0;
             this.btnListen.Text = "Start Server";
             this.btnListen.UseVisualStyleBackColor = true;
+            this.btnListen.Click += new System.EventHandler(this.btnListen_Click);
             // 
             // SettingsPage
             // 
@@ -83,6 +84,7 @@
             this.btnStopListening.TabIndex = 1;
             this.btnStopListening.Text = "Stop Server";
             this.btnStopListening.UseVisualStyleBackColor = true;
+            this.btnStopListening.Click += new System.EventHandler(this.btnStopListening_Click);
             // 
             // gbConnectedClients
             // 
@@ -167,6 +169,7 @@
             this.btnSpam.TabIndex = 7;
             this.btnSpam.Text = "Spam";
             this.btnSpam.UseVisualStyleBackColor = true;
+            this.btnSpam.Click += new System.EventHandler(this.btnSpam_Click);
             // 
             // tbMsg
             // 
@@ -177,12 +180,14 @@
             // 
             // btnSend
             // 
+            this.btnSend.Enabled = false;
             this.btnSend.Location = new System.Drawing.Point(94, 458);
             this.btnSend.Name = "btnSend";
             this.btnSend.Size = new System.Drawing.Size(500, 23);
             this.btnSend.TabIndex = 6;
             this.btnSend.Text = "Send";
             this.btnSend.UseVisualStyleBackColor = true;
+            this.btnSend.Click += new System.EventHandler(this.btnSend_Click);
             // 
             // tsslReceivedMessages
             // 

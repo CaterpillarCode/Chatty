@@ -79,5 +79,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SocksLib\SocksLib.csproj">
+      <Project>{33f90449-2149-4482-95bf-c141dc7d0c3e}</Project>
+      <Name>SocksLib</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -118,6 +118,7 @@
             this.btnConnect.TabIndex = 6;
             this.btnConnect.Text = "Connect";
             this.btnConnect.UseVisualStyleBackColor = true;
+            this.btnConnect.Click += new System.EventHandler(this.BtnConnect_Click);
             // 
             // tbUsername
             // 
@@ -125,15 +126,18 @@
             this.tbUsername.Name = "tbUsername";
             this.tbUsername.Size = new System.Drawing.Size(119, 20);
             this.tbUsername.TabIndex = 5;
+            this.tbUsername.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TbUsername_KeyDown);
             // 
             // btnSend
             // 
+            this.btnSend.Enabled = false;
             this.btnSend.Location = new System.Drawing.Point(14, 394);
             this.btnSend.Name = "btnSend";
             this.btnSend.Size = new System.Drawing.Size(648, 23);
             this.btnSend.TabIndex = 1;
             this.btnSend.Text = "Send";
             this.btnSend.UseVisualStyleBackColor = true;
+            this.btnSend.Click += new System.EventHandler(this.BtnSend_Click);
             // 
             // TbMsg
             // 
@@ -141,6 +145,7 @@
             this.TbMsg.Name = "TbMsg";
             this.TbMsg.Size = new System.Drawing.Size(648, 20);
             this.TbMsg.TabIndex = 0;
+            this.TbMsg.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TbMsg_KeyDown);
             // 
             // SettingsPage
             // 
