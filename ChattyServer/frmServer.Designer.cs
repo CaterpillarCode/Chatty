@@ -28,6 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmServer));
             this.btnListen = new System.Windows.Forms.Button();
             this.SettingsPage = new System.Windows.Forms.TabPage();
             this.btnStopListening = new System.Windows.Forms.Button();
@@ -41,10 +43,12 @@
             this.btnSpam = new System.Windows.Forms.Button();
             this.tbMsg = new System.Windows.Forms.TextBox();
             this.btnSend = new System.Windows.Forms.Button();
-            this.tsslReceivedMessages = new System.Windows.Forms.ToolStripStatusLabel();
+            this.TsslReceivedMessages = new System.Windows.Forms.ToolStripStatusLabel();
             this.tsslServerStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.TsslConnectedClients = new System.Windows.Forms.ToolStripStatusLabel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.niMinimizedNotification = new System.Windows.Forms.NotifyIcon(this.components);
             this.SettingsPage.SuspendLayout();
             this.gbConnectedClients.SuspendLayout();
             this.StatusPage.SuspendLayout();
@@ -69,10 +73,10 @@
             this.SettingsPage.BackColor = System.Drawing.SystemColors.Window;
             this.SettingsPage.Controls.Add(this.btnStopListening);
             this.SettingsPage.Controls.Add(this.btnListen);
-            this.SettingsPage.Location = new System.Drawing.Point(4, 22);
+            this.SettingsPage.Location = new System.Drawing.Point(4, 23);
             this.SettingsPage.Name = "SettingsPage";
             this.SettingsPage.Padding = new System.Windows.Forms.Padding(3);
-            this.SettingsPage.Size = new System.Drawing.Size(796, 535);
+            this.SettingsPage.Size = new System.Drawing.Size(796, 534);
             this.SettingsPage.TabIndex = 1;
             this.SettingsPage.Text = "Settings";
             // 
@@ -91,20 +95,21 @@
             this.gbConnectedClients.Controls.Add(this.clbConnectedClients);
             this.gbConnectedClients.Location = new System.Drawing.Point(600, 6);
             this.gbConnectedClients.Name = "gbConnectedClients";
-            this.gbConnectedClients.Size = new System.Drawing.Size(193, 439);
+            this.gbConnectedClients.Size = new System.Drawing.Size(193, 447);
             this.gbConnectedClients.TabIndex = 14;
             this.gbConnectedClients.TabStop = false;
             this.gbConnectedClients.Text = "Connected Clients";
             // 
             // clbConnectedClients
             // 
+            this.clbConnectedClients.CheckOnClick = true;
             this.clbConnectedClients.Font = new System.Drawing.Font("Rubik", 9.75F, System.Drawing.FontStyle.Bold);
             this.clbConnectedClients.ForeColor = System.Drawing.Color.DarkSeaGreen;
             this.clbConnectedClients.FormattingEnabled = true;
             this.clbConnectedClients.Location = new System.Drawing.Point(6, 19);
             this.clbConnectedClients.Name = "clbConnectedClients";
-            this.clbConnectedClients.Size = new System.Drawing.Size(181, 400);
-            this.clbConnectedClients.TabIndex = 11;
+            this.clbConnectedClients.Size = new System.Drawing.Size(181, 418);
+            this.clbConnectedClients.TabIndex = 4;
             // 
             // StatusPage
             // 
@@ -116,10 +121,11 @@
             this.StatusPage.Controls.Add(this.btnSpam);
             this.StatusPage.Controls.Add(this.tbMsg);
             this.StatusPage.Controls.Add(this.btnSend);
-            this.StatusPage.Location = new System.Drawing.Point(4, 22);
+            this.StatusPage.ForeColor = System.Drawing.SystemColors.Menu;
+            this.StatusPage.Location = new System.Drawing.Point(4, 23);
             this.StatusPage.Name = "StatusPage";
             this.StatusPage.Padding = new System.Windows.Forms.Padding(3);
-            this.StatusPage.Size = new System.Drawing.Size(796, 535);
+            this.StatusPage.Size = new System.Drawing.Size(796, 534);
             this.StatusPage.TabIndex = 0;
             this.StatusPage.Text = "Status";
             // 
@@ -143,30 +149,34 @@
             this.rtbServerMessages.Size = new System.Drawing.Size(576, 414);
             this.rtbServerMessages.TabIndex = 12;
             this.rtbServerMessages.Text = "";
+            this.rtbServerMessages.TextChanged += new System.EventHandler(this.rtbServerMessages_TextChanged);
             // 
             // cbSendToAll
             // 
             this.cbSendToAll.AutoSize = true;
+            this.cbSendToAll.ForeColor = System.Drawing.SystemColors.InfoText;
             this.cbSendToAll.Location = new System.Drawing.Point(6, 460);
             this.cbSendToAll.Name = "cbSendToAll";
-            this.cbSendToAll.Size = new System.Drawing.Size(81, 17);
-            this.cbSendToAll.TabIndex = 10;
+            this.cbSendToAll.Size = new System.Drawing.Size(83, 18);
+            this.cbSendToAll.TabIndex = 3;
             this.cbSendToAll.Text = "Send To All";
             this.cbSendToAll.UseVisualStyleBackColor = true;
             // 
             // nudSpamAmount
             // 
+            this.nudSpamAmount.Font = new System.Drawing.Font("KacstBook", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(178)));
             this.nudSpamAmount.Location = new System.Drawing.Point(600, 459);
             this.nudSpamAmount.Name = "nudSpamAmount";
-            this.nudSpamAmount.Size = new System.Drawing.Size(67, 20);
-            this.nudSpamAmount.TabIndex = 8;
+            this.nudSpamAmount.Size = new System.Drawing.Size(67, 24);
+            this.nudSpamAmount.TabIndex = 5;
             // 
             // btnSpam
             // 
+            this.btnSpam.ForeColor = System.Drawing.SystemColors.ControlDark;
             this.btnSpam.Location = new System.Drawing.Point(673, 458);
             this.btnSpam.Name = "btnSpam";
             this.btnSpam.Size = new System.Drawing.Size(114, 23);
-            this.btnSpam.TabIndex = 7;
+            this.btnSpam.TabIndex = 6;
             this.btnSpam.Text = "Spam";
             this.btnSpam.UseVisualStyleBackColor = true;
             this.btnSpam.Click += new System.EventHandler(this.btnSpam_Click);
@@ -175,53 +185,74 @@
             // 
             this.tbMsg.Location = new System.Drawing.Point(12, 487);
             this.tbMsg.Name = "tbMsg";
-            this.tbMsg.Size = new System.Drawing.Size(775, 20);
+            this.tbMsg.Size = new System.Drawing.Size(775, 22);
             this.tbMsg.TabIndex = 0;
             // 
             // btnSend
             // 
+            this.btnSend.BackColor = System.Drawing.SystemColors.ScrollBar;
             this.btnSend.Enabled = false;
+            this.btnSend.Font = new System.Drawing.Font("Gadugi", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSend.ForeColor = System.Drawing.SystemColors.InfoText;
             this.btnSend.Location = new System.Drawing.Point(94, 458);
             this.btnSend.Name = "btnSend";
             this.btnSend.Size = new System.Drawing.Size(500, 23);
-            this.btnSend.TabIndex = 6;
+            this.btnSend.TabIndex = 2;
             this.btnSend.Text = "Send";
-            this.btnSend.UseVisualStyleBackColor = true;
+            this.btnSend.UseVisualStyleBackColor = false;
             this.btnSend.Click += new System.EventHandler(this.btnSend_Click);
             // 
-            // tsslReceivedMessages
+            // TsslReceivedMessages
             // 
-            this.tsslReceivedMessages.Name = "tsslReceivedMessages";
-            this.tsslReceivedMessages.Size = new System.Drawing.Size(120, 17);
-            this.tsslReceivedMessages.Text = "Received Messages: 0";
+            this.TsslReceivedMessages.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TsslReceivedMessages.Name = "TsslReceivedMessages";
+            this.TsslReceivedMessages.Size = new System.Drawing.Size(160, 20);
+            this.TsslReceivedMessages.Text = "Received Messages: 0";
             // 
             // tsslServerStatus
             // 
+            this.tsslServerStatus.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tsslServerStatus.Name = "tsslServerStatus";
-            this.tsslServerStatus.Size = new System.Drawing.Size(26, 17);
-            this.tsslServerStatus.Text = "Idle";
+            this.tsslServerStatus.Size = new System.Drawing.Size(79, 20);
+            this.tsslServerStatus.Text = "State: Idle";
             // 
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsslServerStatus,
-            this.tsslReceivedMessages});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 539);
+            this.TsslConnectedClients,
+            this.TsslReceivedMessages});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 536);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(804, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(804, 25);
             this.statusStrip1.TabIndex = 5;
             this.statusStrip1.Text = "statusStrip1";
+            // 
+            // TsslConnectedClients
+            // 
+            this.TsslConnectedClients.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold);
+            this.TsslConnectedClients.Name = "TsslConnectedClients";
+            this.TsslConnectedClients.Size = new System.Drawing.Size(151, 20);
+            this.TsslConnectedClients.Text = "Connected Clients: 0";
             // 
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.StatusPage);
             this.tabControl1.Controls.Add(this.SettingsPage);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl1.Font = new System.Drawing.Font("Gadugi", 8.25F);
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(804, 561);
             this.tabControl1.TabIndex = 6;
+            // 
+            // niMinimizedNotification
+            // 
+            this.niMinimizedNotification.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            this.niMinimizedNotification.BalloonTipText = "Chatty Server will be running in the background. :D";
+            this.niMinimizedNotification.BalloonTipTitle = "FYI";
+            this.niMinimizedNotification.Visible = true;
             // 
             // frmServer
             // 
@@ -230,6 +261,8 @@
             this.ClientSize = new System.Drawing.Size(804, 561);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.tabControl1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmServer";
             this.Text = "Server";
             this.SettingsPage.ResumeLayout(false);
@@ -261,10 +294,12 @@
         private System.Windows.Forms.Button btnSpam;
         private System.Windows.Forms.TextBox tbMsg;
         private System.Windows.Forms.Button btnSend;
-        private System.Windows.Forms.ToolStripStatusLabel tsslReceivedMessages;
+        private System.Windows.Forms.ToolStripStatusLabel TsslReceivedMessages;
         private System.Windows.Forms.ToolStripStatusLabel tsslServerStatus;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.NotifyIcon niMinimizedNotification;
+        private System.Windows.Forms.ToolStripStatusLabel TsslConnectedClients;
     }
 }
 

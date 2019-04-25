@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
 using System.IO;
@@ -78,7 +74,7 @@ namespace SocksLib
         private Socket socket;
 
         /// <summary>
-        /// Hold the username of the client.
+        /// Holds the username of the client.
         /// </summary>
         public string Username { get; set; }
         #endregion
@@ -148,17 +144,8 @@ namespace SocksLib
         /// <summary>
         /// Connect to a server.
         /// </summary>
-        /// <param name="host">The host as a string.</param>
-        /// <param name="port">The port of the host.</param>
-        public void Connect(string host, int port)
-        {
-            checkDisposed();
-            this.socket.Connect(host, port);
-            OnSyncConnect();
-        }
-
         /// <summary>
-        /// Connect to a server.
+        /// Connects to a server.
         /// </summary>
         /// <param name="endPoint">The endpoint server to connect too.</param>
         public void Connect(IPEndPoint endPoint)
@@ -169,47 +156,15 @@ namespace SocksLib
         }
 
         /// <summary>
-        /// Connect to a server.
-        /// </summary>
-        /// <param name="ipAddress">The IPAddress instance of the host.</param>
-        /// <param name="port">The port of the host.</param>
-        public void Connect(IPAddress ipAddress, int port)
-        {
-            checkDisposed();
-            this.socket.Connect(ipAddress, port);
-            OnSyncConnect();
-        }
-
-        /// <summary>
         /// Connects to a server asynchronously.
         /// </summary>
         /// <param name="host">The address of the host in a string</param>
         /// <param name="port">The port of the host</param>
-        public void ConnectAsync(string host, int port)
-        {
-            checkDisposed();
-            this.socket.BeginConnect(host, port, connectCallback, null);
-        }
-
-        /// <summary>
-        /// Connects to a server asynchronously.
-        /// </summary>
         /// <param name="endPoint">The IPEndPoint instance of the host.</param>
         public void ConnectAsync(IPEndPoint endPoint)
         {
             checkDisposed();
             this.socket.BeginConnect(endPoint, connectCallback, null);
-        }
-
-        /// <summary>
-        /// Connects to a server asynchronously.
-        /// </summary>
-        /// <param name="ipAddress">The IPAddress instance of the host</param>
-        /// <param name="port">The port of the host</param>
-        public void ConnectAsync(IPAddress ipAddress, int port)
-        {
-            checkDisposed();
-            this.socket.BeginConnect(ipAddress, port, connectCallback, null);
         }
 
         /// <summary>
@@ -429,7 +384,6 @@ namespace SocksLib
             Buffer.BlockCopy(payload, 0, fullBuffer, sizeBuffer.Length, payload.Length);
 
             //Send the data off.
-            //The Try-Catch statement is new. Added after the tutorial just in case
             try
             {
                 this.socket.BeginSend(fullBuffer, 0, fullBuffer.Length, 0, sendCallback, null);

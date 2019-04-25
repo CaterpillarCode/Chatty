@@ -14,87 +14,97 @@ namespace ChattyServer
 {
     public partial class frmServer : Form
     {
-        TcpServerSocket listenerSocket;
+        // Socket used to listen for clients
+        TcpServerSocket serverSocket;
 
-        int MessagesReceived = 0;
+        // Total messages received from clients
+        int TotalMessagesRecieved = 0;
 
         public frmServer()
         {
             InitializeComponent();
         }
 
-        private void btnListen_Click(object sender, EventArgs e)
+        #region Starting
+        /// <summary>
+        /// Starts listening for new connections.
+        /// </summary>
+        void StartServer(IPEndPoint _ipEndpoint)
         {
-            if (listenerSocket == null || !listenerSocket.Running)
+            // Starts listening if the server isn't already listening.
+            if (this.serverSocket == null || !this.serverSocket.Running)
             {
-                StartServer();
+                this.serverSocket = new TcpServerSocket(_ipEndpoint)
+                {
+                    ConnectedClients = new List<TcpClientSocket>()
+                };
+
+                // Subscribe to find when new clients are connected.
+                // <param="s"> The instance of the class that invoded the event. <param>
+                // <param="e"> AcceptedTcpSocketEventArgs (which contains the accepted socket, the remote endpoint, the tcpsocket connection state (e.g. an exception that has occured or if the socket is connected, if a data has been received and a reference to the socket in the socket object which can be used for extra purposes.))<param>
+                this.serverSocket.Accepted += (s, e) =>
+                {
+                    this.serverSocket.ConnectedClients.Add(e.AcceptedSocket);
+                    beginReceiving(this.serverSocket.ConnectedClients[this.serverSocket.ConnectedClients.IndexOf(e.AcceptedSocket)]);
+                    TsslConnectedClients.Text = $"Connected Clients: {this.serverSocket.ConnectedClients.Count}";
+                };
+
+                this.serverSocket.ConnectedClients.Clear();
+
+                for (int i = 0; i < this.serverSocket.ConnectedClients.Count; i++)
+                {
+                    this.serverSocket.ConnectedClients[i] = null;
+                }
+
+                try
+                {
+                    this.serverSocket.Start();
+
+                    if (rtbServerMessages.TextLength <= 0)
+                    {
+                        AppendText("Server started.", true);
+                    }
+                    else
+                    {
+                        AppendText("Server started.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString(), "Unable to start the server.");
+                }
+
                 btnSend.Enabled = true;
-                tsslServerStatus.Text = "Server started";
+                tsslServerStatus.Text = "State: Running";
             }
             else
             {
                 MessageBox.Show("The server is already started.", "Cannot Start Server");
             }
         }
+        #endregion
 
-        void StartServer()
+        #region Stoping
+        void StopServer()
         {
-            listenerSocket = new TcpServerSocket(IPAddress.Parse("127.0.0.1"), 25565);
-            listenerSocket.ConnectedClients = new List<TcpClientSocket>();
-
-            // Subscribe to find when new clients are connected.
-            // <param="s"> The instance of the class that invoded the event. <param>
-            // <param="e"> AcceptedTcpSocketEventArgs (which contains the accepted socket, the remote endpoint, the tcpsocket connection state (e.g. an exception that has occured or if the socket is connected, if a data has been received and a reference to the socket in the socket object which can be used for extra purposes.))<param>
-            listenerSocket.Accepted += (s, e) =>
-            {
-                listenerSocket.ConnectedClients.Add(e.AcceptedSocket);
-                beginReceiving(listenerSocket.ConnectedClients[listenerSocket.ConnectedClients.IndexOf(e.AcceptedSocket)]);
-                // TODO: BeginAccept Again unless it's already listening for client.s
-                //listenerSocket.Stop();
-            };
-
-            for (int i = 0; i < listenerSocket.ConnectedClients.Count; i++)
-            {
-                listenerSocket.ConnectedClients[i] = null;
-            }
-
-            try
-            {
-                listenerSocket.Start();
-
-                if (rtbServerMessages.TextLength <= 0)
-                {
-                    AppendText("Server started.", true);
-                }
-                else
-                {
-                    AppendText("Server started.");
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString(), "Unable to start the server.");
-            }
-        }
-
-        private void btnStopListening_Click(object sender, EventArgs e)
-        {
-            if (listenerSocket.Running)
+            if (this.serverSocket.Running)
             {
                 try
                 {
                     // Disconnect all connected clients
-                    foreach (var _client in listenerSocket.ConnectedClients)
+                    foreach (var _client in this.serverSocket.ConnectedClients)
                     {
-                        _client.Disconnect();
-                        //listenerSocket.ConnectedClients.Remove(_client);
-                        //clbConnectedClients.Items.Remove(_client.GetIpEndPointString());
+                        if (_client is TcpClientSocket tcs)
+                        {
+                            Send(_client, "The server has been shutdown.");
+                            tcs.Disconnect();
+                        }
                     }
 
-                    listenerSocket.Stop();
+                    this.serverSocket.Stop();
                     btnSend.Enabled = false;
                     AppendText("\nServer stopped.", true);
-                    tsslServerStatus.Text = "Idle";
+                    tsslServerStatus.Text = "State: Stopped";
                 }
                 catch (Exception ex)
                 {
@@ -106,7 +116,9 @@ namespace ChattyServer
                 MessageBox.Show("The server is not running.", "Cannot Stop Server");
             }
         }
+        #endregion
 
+        #region Sending
         private void Send(TcpClientSocket _tcpSocket, string _sendMessage)
         {
             if (_tcpSocket != null && _tcpSocket.Connected)
@@ -129,11 +141,6 @@ namespace ChattyServer
             }
         }
 
-        private void btnSend_Click(object sender, EventArgs e)
-        {
-            SendMessage(tbMsg.Text);
-        }
-
         private void SendMessage(string _message)
         {
             if (_message != string.Empty && _message != null)
@@ -142,7 +149,7 @@ namespace ChattyServer
                 {
                     if (clbConnectedClients.Items.Count > 0)
                     {
-                        foreach (var _client in listenerSocket.ConnectedClients)
+                        foreach (var _client in this.serverSocket.ConnectedClients)
                         {
                             if (_client.Connected)
                             {
@@ -166,16 +173,16 @@ namespace ChattyServer
                     {
                         for (int i = 0; i < clbConnectedClients.CheckedItems.Count; i++)
                         {
-                            for (int j = 0; j < listenerSocket.ConnectedClients.Count; j++)
+                            for (int j = 0; j < this.serverSocket.ConnectedClients.Count; j++)
                             {
-                                if (listenerSocket.ConnectedClients[j].Connected)
+                                if (this.serverSocket.ConnectedClients[j].Connected)
                                 {
-                                    Send(listenerSocket.ConnectedClients[j], _message);
-                                    AppendText($"Server > {listenerSocket.ConnectedClients[j].GetIpEndPointString()}: {_message}");
+                                    Send(this.serverSocket.ConnectedClients[j], _message);
+                                    AppendText($"Server > {this.serverSocket.ConnectedClients[j].GetIpEndPointString()}: {_message}");
                                 }
                                 else
                                 {
-                                    AppendText($"Could not send the message to {listenerSocket.ConnectedClients[j].GetIpEndPointString()}. (Client disconnected)");
+                                    AppendText($"Could not send the message to {this.serverSocket.ConnectedClients[j].GetIpEndPointString()}. (Client disconnected)");
                                 }
                             }
                         }
@@ -201,11 +208,11 @@ namespace ChattyServer
             {
                 if (clbConnectedClients.SelectedItems.Count > 0)
                 {
-                    for (int i = 0; i < listenerSocket.ConnectedClients.Count; i++)
+                    for (int i = 0; i < this.serverSocket.ConnectedClients.Count; i++)
                     {
                         for (int j = 0; j < nudSpamAmount.Value; j++)
                         {
-                            Send(listenerSocket.ConnectedClients[i], _message);
+                            Send(this.serverSocket.ConnectedClients[i], _message);
                         }
                     }
                 }
@@ -218,7 +225,7 @@ namespace ChattyServer
             {
                 if (clbConnectedClients.SelectedItems.Count > 0)
                 {
-                    foreach (var _client in listenerSocket.ConnectedClients)
+                    foreach (var _client in this.serverSocket.ConnectedClients)
                     {
                         if (_client.Connected)
                         {
@@ -240,37 +247,53 @@ namespace ChattyServer
                 }
             }
         }
+        #endregion
 
+        #region Receiving
         private void beginReceiving(TcpClientSocket client)
         {
             client.DataReceived += (ds, de) =>
             {
-                MessagesReceived++;
+                string payloadString = Encoding.ASCII.GetString(de.Payload);
 
-                if (MessagesReceived == 1)
+                // If the message starts with a special string, update the username
+                if (payloadString.StartsWith("<c>username"))
                 {
-                    client.Username = Encoding.ASCII.GetString(de.Payload);
+                    client.Username = payloadString.Remove(0, 11);
                     this.Invoke((MethodInvoker)(() => clbConnectedClients.Items.Add($"{client.Username}")));
                     AppendText($"{client.Username} has connected. ({client.GetIpEndPointString()})");
                 }
                 else
                 {
-                    AppendText($"From {client.GetIpEndPointString()}: {Encoding.ASCII.GetString(de.Payload)}");
-                    tsslReceivedMessages.Text = $"Received Messages: {MessagesReceived - 1}";
+                    TotalMessagesRecieved++;
+                    AppendText($"{client.Username}: {Encoding.ASCII.GetString(de.Payload)}");
+                    TsslReceivedMessages.Text = $"Received Messages: {TotalMessagesRecieved}";
                 }
             };
 
             client.Disconnected += (ds, de) =>
             {
-                AppendText($"{client.Username} has disconnected!");
+                try
+                {
+                    // Output to the server console
+                    AppendText($"{client.Username} has disconnected!");
 
-                clbConnectedClients.InvokeIfRequired(s => { s.Items.Remove(clbConnectedClients.Items.IndexOf(client)); });
+                    // Remove the socket from the checked list box
+                    clbConnectedClients.InvokeIfRequired(s => { s.Items.RemoveAt(this.serverSocket.GetClientListIndex(client)); });
 
-                //this.Invoke((MethodInvoker)(() => clbConnectedClients.Items.Remove(clbConnectedClients.Items.IndexOf(client))));
+                    // Remove the socket from the list of connected clients.
+                    this.serverSocket.ConnectedClients.Remove(client);
 
-                listenerSocket.ConnectedClients.Remove(client);
+                    // Displays how many clients are connected
+                    TsslConnectedClients.Text = $"Connected Clients: {this.serverSocket.ConnectedClients.Count}";
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
             };
         }
+        #endregion
 
         /// <summary>
         /// Pushes text to the chat window.
@@ -285,10 +308,51 @@ namespace ChattyServer
                 rtbServerMessages.InvokeIfRequired(s => { s.AppendText($"{_textToAppend}"); });
         }
 
+        #region Control Events
+
+        /// <summary>
+        /// Tries to start listeing for connections.
+        /// </summary>
+        private void btnListen_Click(object sender, EventArgs e)
+        {   
+            // Server IP
+            IPAddress ipAddress = IPAddress.Parse("127.0.0.1");
+            // Server Port
+            int port = 25565;
+            // Server Endpoint
+            IPEndPoint ipEnd = new IPEndPoint(ipAddress, port);
+
+            // Starts listening for clients
+            StartServer(ipEnd);
+        }
+
+        /// <summary>
+        /// Tries to stop listening for connections.
+        /// </summary>
+        private void btnStopListening_Click(object sender, EventArgs e)
+        {
+            // Stops the server
+            StopServer();
+        }
+
+        private void btnSend_Click(object sender, EventArgs e)
+        {
+            SendMessage(tbMsg.Text);
+        }
+
         private void btnSpam_Click(object sender, EventArgs e)
         {
             SpamMessage(tbMsg.Text);
         }
+
+        private void rtbServerMessages_TextChanged(object sender, EventArgs e)
+        {
+            // set the current caret position to the end
+            rtbServerMessages.SelectionStart = rtbServerMessages.Text.Length;
+            // scroll to the latest message
+            rtbServerMessages.ScrollToCaret();
+        }
+        #endregion
     }
 
     public static class ControlHelpers

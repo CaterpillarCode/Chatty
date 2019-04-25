@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
 using System.Diagnostics;
@@ -48,6 +45,11 @@ namespace SocksLib
         public List<TcpClientSocket> ConnectedClients { get; set; }
 
         /// <summary>
+        /// A string containing the socket IP and Port.
+        /// </summary>
+        public IPEndPoint SocketEndpoint { get; private set; }
+
+        /// <summary>
         /// Holds the instance of the socket used as a listener.
         /// </summary>
         private Socket listener;
@@ -56,23 +58,15 @@ namespace SocksLib
         /// Instantiates a new TcpListener.
         /// </summary>
         /// <param name="port">The port to listen on.</param>
-        public TcpServerSocket(int port)
-        {
-            //Set the port that will be used
-            this.Port = port;
-        }
 
         /// <summary>
         /// Instantiates a new TcpListener. (NOT WORKING)
         /// </summary>
         /// <param name="port">The port to listen on.</param>
         /// <param name="ip">The IP address to listen on.</param>
-        public TcpServerSocket(IPAddress ip, int port)
+        public TcpServerSocket(IPEndPoint ipEnd)
         {
-            //Set the ip that will be used
-            this.IP = ip;
-            //Set the port that will be used
-            this.Port = port;
+            this.SocketEndpoint = ipEnd;
         }
 
         /// <summary>
@@ -87,7 +81,7 @@ namespace SocksLib
                 this.listener =
                     new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 //Bind the socket to this PC's loopback, but with the desired port.
-                this.listener.Bind(new IPEndPoint(IPAddress.Parse("127.0.0.1"), this.Port));
+                this.listener.Bind(SocketEndpoint);
                 //Start listening with a connection queue of 100.
                 this.listener.Listen(0);
                 //Set running to true.
@@ -161,6 +155,11 @@ namespace SocksLib
                     this.listener = null;
                 }
             }
+        }
+
+        public int GetClientListIndex(TcpClientSocket _client)
+        {
+            return ConnectedClients.IndexOf(_client);
         }
     }
 }
